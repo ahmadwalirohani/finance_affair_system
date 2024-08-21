@@ -1,9 +1,33 @@
 <?php
 require './utils/auth_session.php';
+require './utils/db.php';
+
 
 include('./partials/header.php');
 include('./partials/navbar.php');
 include('./partials/sidebar.php');
+
+
+try {
+    // Prepare the SQL query
+    $totalExpenseIncome = $conn->prepare("SELECT SUM(credit) as income , SUM(debit) as expense FROM transactions");
+    $totalRenveue = $conn->prepare("SELECT SUM(balance) as revenue FROM treasures");
+    $totalTeachers = $conn->prepare("SELECT COUNT(id) as teachers FROM treasures");
+    $totalExpenseIncome->execute();
+    $totalRenveue->execute();
+    $totalTeachers->execute();
+
+    // Fetch all results
+    $totalExpenseIncome = $totalExpenseIncome->fetchAll(PDO::FETCH_ASSOC)[0];
+    $totalRenveue = $totalRenveue->fetchAll(PDO::FETCH_ASSOC)[0];
+    $totalTeachers = $totalTeachers->fetchAll(PDO::FETCH_ASSOC)[0];
+} catch (PDOException $e) {
+    echo "Error: " . $e->getMessage();
+}
+
+$conn = null; // Close the database connection
+
+
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -30,14 +54,14 @@ include('./partials/sidebar.php');
                     <!-- small box -->
                     <div class="small-box bg-info">
                         <div class="inner">
-                            <h3>150</h3>
+                            <h3><?php echo number_format($totalExpenseIncome['income']); ?></h3>
 
-                            <p>سفارشات جدید</p>
+                            <p>جمله عاید</p>
                         </div>
                         <div class="icon">
                             <i class="ion ion-bag"></i>
                         </div>
-                        <a href="#" class="small-box-footer">اطلاعات بیشتر <i class="fa fa-arrow-circle-left"></i></a>
+
                     </div>
                 </div>
                 <!-- ./col -->
@@ -45,14 +69,14 @@ include('./partials/sidebar.php');
                     <!-- small box -->
                     <div class="small-box bg-success">
                         <div class="inner">
-                            <h3>53<sup style="font-size: 20px">%</sup></h3>
+                            <h3><?php echo number_format($totalExpenseIncome['expense']); ?></h3>
 
-                            <p>افزایش امتیاز</p>
+                            <p> جمله مصرف</p>
                         </div>
                         <div class="icon">
                             <i class="ion ion-stats-bars"></i>
                         </div>
-                        <a href="#" class="small-box-footer">اطلاعات بیشتر <i class="fa fa-arrow-circle-left"></i></a>
+
                     </div>
                 </div>
                 <!-- ./col -->
@@ -60,14 +84,13 @@ include('./partials/sidebar.php');
                     <!-- small box -->
                     <div class="small-box bg-warning">
                         <div class="inner">
-                            <h3>44</h3>
-
-                            <p>کاربران ثبت شده</p>
+                            <h3><?php echo number_format($totalRenveue['revenue']); ?></h3>
+                            <p> اوسنی بودجه</p>
                         </div>
                         <div class="icon">
                             <i class="ion ion-person-add"></i>
                         </div>
-                        <a href="#" class="small-box-footer">اطلاعات بیشتر <i class="fa fa-arrow-circle-left"></i></a>
+
                     </div>
                 </div>
                 <!-- ./col -->
@@ -75,14 +98,13 @@ include('./partials/sidebar.php');
                     <!-- small box -->
                     <div class="small-box bg-danger">
                         <div class="inner">
-                            <h3>65</h3>
-
-                            <p>بازدید جدید</p>
+                            <h3><?php echo number_format($totalTeachers['teachers']); ?></h3>
+                            <p>ټول استادان</p>
                         </div>
                         <div class="icon">
                             <i class="ion ion-pie-graph"></i>
                         </div>
-                        <a href="#" class="small-box-footer">اطلاعات بیشتر <i class="fa fa-arrow-circle-left"></i></a>
+
                     </div>
                 </div>
                 <!-- ./col -->
