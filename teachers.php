@@ -88,7 +88,7 @@ $conn = null; // Close the database connection
                         </div>
                         <!-- /.card-header -->
                         <div class="card-body">
-                            <table class="table table-bordered">
+                            <table id="example1" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
                                         <th style="width: 10px">#</th>
@@ -145,8 +145,23 @@ $conn = null; // Close the database connection
 
 
 <?php include('./partials/footer.php'); ?>
+<script src="plugins/datatables/jquery.dataTables.js"></script>
+<script src="plugins/datatables/dataTables.bootstrap4.js"></script>
 <script>
     $(function() {
+
+        $("#example1").DataTable({
+            "language": {
+                "paginate": {
+                    "next": "بعدی",
+                    "previous": "قبلی"
+                },
+                'search': 'سرچ کول',
+                "lengthMenu": "کتل _MENU_ راپور"
+
+            },
+            "info": false,
+        });
 
         $(document).on('click', '.edit_teacher', function() {
             const params = JSON.parse(this.dataset.id);
