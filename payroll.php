@@ -12,6 +12,33 @@ try {
     // Prepare the SQL query
 
     $payrolls = $conn->prepare("SELECT payrolls.* , teachers.name as teacher,teachers.job as job FROM payrolls INNER JOIN teachers ON payrolls.teacher_id = teachers.id");
+
+    if (isset($_GET['search'])) {
+        $search = '%' . $_GET['search'] . '%';
+
+        $payrolls = $conn->prepare(
+            "SELECT 
+                payrolls.*, 
+                teachers.name AS teacher,
+                teachers.job AS job
+            FROM 
+                payrolls 
+            INNER JOIN 
+                teachers ON payrolls.teacher_id = teachers.id 
+            WHERE 
+                teachers.name LIKE :t_search 
+                OR payrolls.year LIKE :y_search 
+                OR payrolls.month LIKE :m_search 
+                OR teachers.job LIKE :j_search 
+                "
+        );
+
+        $payrolls->bindParam(':t_search', $search);
+        $payrolls->bindParam(':y_search', $search);
+        $payrolls->bindParam(':m_search', $search);
+        $payrolls->bindParam(':j_search', $search);
+    }
+
     $payrolls->execute();
     $payrolls = $payrolls->fetchAll(PDO::FETCH_ASSOC);
 
@@ -148,7 +175,20 @@ $conn = null; // Close the database connection
                             <h3 class="card-title">توزیع راپور</h3>
                         </div>
                         <div class="card-header">
+                            <div class="row" id="department-div">
+                                <div class="col-3">
+                                    <a href="printouts/payroll_print.php?search=<?php echo $_GET['search'] ?? '' ?>" target="_blank" class="btn btn-primary btn-block">چاپ</a>
+                                </div>
 
+                                <form action="payroll.php" class="row col-7" method="get">
+                                    <div class="col-5">
+                                        <input type="search" value="<?php echo $_GET['search'] ?? '';  ?>" class="form-control" placeholder="پلټنه ...." name="search" />
+                                    </div>
+                                    <div class="col-3">
+                                        <button type="submit" class="btn btn-dark">پلټنه</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                         <!-- /.card-header -->
                         <div class="card-body">

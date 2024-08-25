@@ -10,7 +10,42 @@ include('./partials/sidebar.php');
 
 try {
     // Prepare the SQL query
+
+
     $transactionReport = $conn->prepare("SELECT transactions.*, accounts.name as account, departments.name as department, treasures.name as treasure FROM transactions INNER JOIN accounts ON transactions.account_id = accounts.id INNER JOIN treasures ON transactions.treasure_id = treasures.id INNER JOIN departments ON  transactions.department_id = departments.id");
+
+    if (isset($_GET['search'])) {
+        $search = '%' . $_GET['search'] . '%';
+
+        $transactionReport = $conn->prepare(
+            "SELECT 
+                transactions.*, 
+                accounts.name AS account, 
+                departments.name AS department, 
+                treasures.name AS treasure 
+            FROM 
+                transactions 
+            INNER JOIN 
+                accounts ON transactions.account_id = accounts.id 
+            INNER JOIN 
+                treasures ON transactions.treasure_id = treasures.id 
+            INNER JOIN 
+                departments ON transactions.department_id = departments.id 
+            WHERE 
+                accounts.name LIKE :a_search 
+                OR treasures.name LIKE :t_search 
+                OR departments.name LIKE :d_search 
+                OR transactions.period LIKE :p_search
+                "
+        );
+
+        $transactionReport->bindParam(':a_search', $search);
+        $transactionReport->bindParam(':t_search', $search);
+        $transactionReport->bindParam(':d_search', $search);
+        $transactionReport->bindParam(':p_search', $search);
+    }
+
+
     $transactionReport->execute();
     $transactions = $transactionReport->fetchAll(PDO::FETCH_ASSOC);
 
@@ -142,6 +177,10 @@ $conn = null; // Close the database connection
                                     <input type="number" id="amount" name="amount" required class="form-control" placeholder="مبلغ  *">
                                 </div>
                                 <div class="col-12 ">
+                                    <label for="period" class="control-label">دوره </label>
+                                    <input type="text" id="period" name="period" class="form-control" placeholder="دوره  *">
+                                </div>
+                                <div class="col-12 ">
                                     <label for="remarks" class="control-label">توضیحات </label>
                                     <textarea type="text" id="remarks" name="remarks" class="form-control" placeholder="توضیحات" rows="3"></textarea>
                                 </div>
@@ -165,8 +204,17 @@ $conn = null; // Close the database connection
                         <div class="card-header">
                             <div class="row" id="department-div">
                                 <div class="col-3">
-                                    <a href="printouts/transactions_print.php" target="_blank" id="print" class="btn btn-primary btn-block">چاپ</a>
+                                    <a href="printouts/transactions_print.php?search=<?php echo $_GET['search'] ?? '' ?>" target="_blank" id="print" class="btn btn-primary btn-block">چاپ</a>
                                 </div>
+
+                                <form action="transaction.php" class="row col-7" method="get">
+                                    <div class="col-5">
+                                        <input type="search" value="<?php echo $_GET['search'] ?? '';  ?>" class="form-control" placeholder="پلټنه ...." name="search" />
+                                    </div>
+                                    <div class="col-3">
+                                        <button type="submit" class="btn btn-dark">پلټنه</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                         <!-- /.card-header -->
@@ -184,6 +232,7 @@ $conn = null; // Close the database connection
                                         <th>کریدیت</th>
                                         <th>دیبیت</th>
                                         <th>څانګه</th>
+                                        <th>دوره</th>
                                         <th style="width: 40px">عمليی</th>
                                     </tr>
                                 </thead>
@@ -207,6 +256,7 @@ $conn = null; // Close the database connection
                                             <td> <b> <?php echo htmlspecialchars($transaction['credit']) ?? ''; ?> </b></td>
                                             <td> <b> <?php echo htmlspecialchars($transaction['debit']) ?? ''; ?> </b></td>
                                             <td><?php echo htmlspecialchars($transaction['department']) ?? ''; ?></td>
+                                            <td><?php echo htmlspecialchars($transaction['period'] ?? '') ?? ''; ?></td>
                                             <td>
                                                 <div class="btn-group">
                                                     <button class="btn btn-sm btn-secondary edit_transaction" data-id="<?php echo htmlspecialchars($jsonTransaction, ENT_QUOTES, 'UTF-8'); ?>"> تغیر </button>

@@ -7,6 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $treasure = $_POST['treasure'];
     $department = $_POST['department']  ?? null;
     $amount = $_POST['amount'];
+    $period = $_POST['period'] ?? null;
     $remarks = $_POST['remarks'];
 
     $credit  = 0;
@@ -43,13 +44,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
     try {
-        $stmt = $conn->prepare("INSERT INTO transactions (treasure_id, account_id, department_id, credit, debit, remarks) VALUES (:treasure, :account,:department, :credit, :debit, :remarks)");
+        $stmt = $conn->prepare("INSERT INTO transactions (treasure_id, account_id, department_id, credit, debit, remarks,period) VALUES (:treasure, :account,:department, :credit, :debit, :remarks,:period)");
         $stmt->bindParam(':treasure', $treasure);
         $stmt->bindParam(':account', $account);
         $stmt->bindParam(':department', $department);
         $stmt->bindParam(':credit', $credit);
         $stmt->bindParam(':debit', $debit);
         $stmt->bindParam(':remarks', $remarks);
+        $stmt->bindParam(':period', $period);
 
         if ($stmt->execute()) {
             $_SESSION['message'] = "عملیه په بریا سره اجرا سول";

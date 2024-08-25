@@ -8,15 +8,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $consumer = $_POST['consumer'];
     $quantity = $_POST['quantity'];
     $remarks = $_POST['remarks'];
+    $period = $_POST['period'];
 
 
     try {
-        $stmt = $conn->prepare("INSERT INTO dedicated_items (item_id, department_id,consumer,quantity,remarks) VALUES (:item, :department,:consumer,:quantity,:remarks)");
+        $stmt = $conn->prepare("INSERT INTO dedicated_items (item_id, department_id,consumer,quantity,remarks,period) VALUES (:item, :department,:consumer,:quantity,:remarks,:period)");
         $stmt->bindParam(':item', $item);
         $stmt->bindParam(':department', $department);
         $stmt->bindParam(':consumer', $consumer);
         $stmt->bindParam(':quantity', $quantity);
         $stmt->bindParam(':remarks', $remarks);
+        $stmt->bindParam(':period', $period);
 
 
 

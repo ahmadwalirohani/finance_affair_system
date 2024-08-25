@@ -8,6 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['id'])) {
     $department = $_POST['department']  ?? null;
     $amount = $_POST['amount'];
     $remarks = $_POST['remarks'];
+    $period = $_POST['period'];
     $id = $_GET['id'];
 
     $TransactionType  = $conn->prepare("SELECT type FROM accounts WHERE id = " . $account);
@@ -37,13 +38,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['id'])) {
     $treasureUpdate->execute();
 
     try {
-        $stmt = $conn->prepare("UPDATE transactions SET  treasure_id = :treasure, account_id  = :account, department_id = :department, credit = :credit, debit = :debit, remarks = :remarks WHERE id = :id");
+        $stmt = $conn->prepare("UPDATE transactions SET  treasure_id = :treasure, account_id  = :account, department_id = :department, credit = :credit, debit = :debit, remarks = :remarks , period = :period WHERE id = :id");
         $stmt->bindParam(':treasure', $treasure);
         $stmt->bindParam(':account', $account);
         $stmt->bindParam(':department', $department);
         $stmt->bindParam(':credit', $credit);
         $stmt->bindParam(':debit', $debit);
         $stmt->bindParam(':remarks', $remarks);
+        $stmt->bindParam(':period', $period);
         $stmt->bindParam(':id', $id);
 
         if ($stmt->execute()) {

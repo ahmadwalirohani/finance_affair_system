@@ -8,17 +8,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['id'])) {
     $consumer = $_POST['consumer'];
     $quantity = $_POST['quantity'];
     $remarks = $_POST['remarks'];
+    $period = $_POST['period'];
     $id = $_GET['id'];
 
 
     try {
-        $stmt = $conn->prepare("UPDATE dedicated_items SET item_id = :item, department_id = :department,consumer = :consumer, quantity = :quantity , remarks = :remarks WHERE id = :id");
+        $stmt = $conn->prepare("UPDATE dedicated_items SET item_id = :item, department_id = :department,consumer = :consumer, quantity = :quantity , remarks = :remarks , period = :period WHERE id = :id");
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':item', $item);
         $stmt->bindParam(':department', $department);
         $stmt->bindParam(':consumer', $consumer);
         $stmt->bindParam(':quantity', $quantity);
         $stmt->bindParam(':remarks', $remarks);
+        $stmt->bindParam(':period', $period);
 
         // decrease item quantity from getting item inventory
         $itemModel = $conn->prepare("SELECT * FROM items WHERE id = :id");

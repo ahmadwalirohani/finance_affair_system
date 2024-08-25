@@ -92,17 +92,23 @@ $conn = null; // Close the database connection
                                 <div class="col-1">
                                     <input type="number" step="0.000001" id="quantity" name="quantity" required class="form-control" placeholder=" تعداد ">
                                 </div>
-                                <div class="col-3">
+                                <div class="col-2">
+                                    <input type="text" id="period" name="period" required class="form-control" placeholder="دوره  ">
+                                </div>
+                                <div class="col-2">
                                     <input type="text" id="remarks" name="remarks" required class="form-control" placeholder="توضیحات  ">
                                 </div>
                                 <div class="col-1">
                                     <button type="submit" id="submit" class="btn btn-primary btn-block">ثبت</button>
                                 </div>
+                                <div class="col-1 mt-2">
+                                    <a href="printouts/dedicated_items_print.php" target="_blank" id="print" class="btn btn-dark btn-block">چاپ</a>
+                                </div>
                             </form>
                         </div>
                         <!-- /.card-header -->
                         <div class="card-body">
-                            <table class="table table-bordered">
+                            <table id="example1" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
                                         <th>#</th>
@@ -113,6 +119,7 @@ $conn = null; // Close the database connection
                                         <th>توضیحات</th>
                                         <th>حالت</th>
                                         <th>تاریخ</th>
+                                        <th>دوره</th>
                                         <th>عمليی</th>
                                     </tr>
                                 </thead>
@@ -136,6 +143,7 @@ $conn = null; // Close the database connection
                                                 <?php } ?>
                                             </td>
                                             <td><?php echo htmlspecialchars(substr($item['created_at'], 0, 10)); ?></td>
+                                            <td><?php echo htmlspecialchars($item['period'] ?? ''); ?></td>
                                             <td>
                                                 <div class="btn-group">
                                                     <button class="btn btn-sm btn-secondary edit_item" data-id="<?php echo htmlspecialchars($jsonItem, ENT_QUOTES, 'UTF-8'); ?>"> تغیر </button>
@@ -164,8 +172,24 @@ $conn = null; // Close the database connection
     <!-- /.content -->
 </div>
 <?php include('./partials/footer.php') ?>
+<script src="plugins/datatables/jquery.dataTables.js"></script>
+<script src="plugins/datatables/dataTables.bootstrap4.js"></script>
 <script>
     $(function() {
+
+
+        $("#example1").DataTable({
+            "language": {
+                "paginate": {
+                    "next": "بعدی",
+                    "previous": "قبلی"
+                },
+                'search': 'سرچ کول',
+                "lengthMenu": "کتل _MENU_ راپور"
+
+            },
+            "info": false,
+        });
 
         $(document).on('click', '.edit_item', function() {
             const params = JSON.parse(this.dataset.id);

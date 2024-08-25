@@ -5,6 +5,38 @@ require '../utils/db.php';
 try {
     // Prepare the SQL query
     $transactionReport = $conn->prepare("SELECT transactions.*, accounts.name as account, departments.name as department, treasures.name as treasure FROM transactions INNER JOIN accounts ON transactions.account_id = accounts.id INNER JOIN treasures ON transactions.treasure_id = treasures.id INNER JOIN departments ON  transactions.department_id = departments.id");
+
+    if (isset($_GET['search'])) {
+        $search = '%' . $_GET['search'] . '%';
+
+        $transactionReport = $conn->prepare(
+            "SELECT 
+                transactions.*, 
+                accounts.name AS account, 
+                departments.name AS department, 
+                treasures.name AS treasure 
+            FROM 
+                transactions 
+            INNER JOIN 
+                accounts ON transactions.account_id = accounts.id 
+            INNER JOIN 
+                treasures ON transactions.treasure_id = treasures.id 
+            INNER JOIN 
+                departments ON transactions.department_id = departments.id 
+            WHERE 
+                accounts.name LIKE :a_search 
+                OR treasures.name LIKE :t_search 
+                OR departments.name LIKE :d_search 
+                OR transactions.period LIKE :p_search
+                "
+        );
+
+        $transactionReport->bindParam(':a_search', $search);
+        $transactionReport->bindParam(':t_search', $search);
+        $transactionReport->bindParam(':d_search', $search);
+        $transactionReport->bindParam(':p_search', $search);
+    }
+
     $transactionReport->execute();
     $transactions = $transactionReport->fetchAll(PDO::FETCH_ASSOC);
 
@@ -61,6 +93,7 @@ $conn = null; // Close the database connection
                             <th>کریدیت</th>
                             <th>دیبیت</th>
                             <th>څانګه</th>
+                            <th>دوره</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -82,6 +115,7 @@ $conn = null; // Close the database connection
                                 <td> <b> <?php echo htmlspecialchars($transaction['credit']) ?? ''; ?> </b></td>
                                 <td> <b> <?php echo htmlspecialchars($transaction['debit']) ?? ''; ?> </b></td>
                                 <td><?php echo htmlspecialchars($transaction['department']) ?? ''; ?></td>
+                                <td><?php echo htmlspecialchars($transaction['period']) ?? ''; ?></td>
 
                             </tr>
                         <?php endforeach; ?>
